@@ -249,15 +249,33 @@ const Crud = () => {
     setProyectoEditado(null);
   };
 
-  const guardarEdicionProyecto = (proyectoActualizado) => {
-    console.log("Proyecto actualizado:", proyectoActualizado); // Verificar valores
-    setProyectos((prevProyectos) =>
-      prevProyectos.map((proyecto) => (proyecto.id === proyectoActualizado.id ? proyectoActualizado : proyecto))
-    );
+ const guardarEdicionProyecto = async (proyectoActualizado) => {
+    try {
+      const response = await fetch(`https://examenfinalapi-uqeu.onrender.com/api/proyectos/update/${proyectoActualizado.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(proyectoActualizado),
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        setProyectos((prevProyectos) =>
+          prevProyectos.map((proyecto) => (proyecto.id === proyectoActualizado.id ? data.proyecto : proyecto))
+        );
+        setMensaje('Proyecto editado con éxito');
+        setError(false);
+      } else {
+        setMensaje(`Error: ${data.message || 'Ocurrió un error inesperado'}`);
+        setError(true);
+      }
+    } catch (error) {
+      setMensaje('Error en la comunicación con la API');
+      setError(true);
+    }
+
     setProyectoEditado(null);
-    setMensaje('Proyecto editado con éxito');
-    setError(false);
   };
+
 
   return (
     <div>
